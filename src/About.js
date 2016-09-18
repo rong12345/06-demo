@@ -1,34 +1,61 @@
 import React, { PropTypes } from 'react';
-import axios from 'axios';
+import { searchGit } from './utils/helpers';
 
 class About extends React.Component {
   constructor(){
     super();
     this.state={
       data:{},
-      wait:true
+      wait:true,
+      inputValue:'username'
     }
   }
   componentDidMount(){
-    axios.get('https://api.github.com/users/newming')
-      .then((res) => {
-        // console.log(res.data);
-        this.setState({
-          data:res.data,
-          wait:false
-        })
+    // searchGit()
+    // .then( (recData) => {
+    //   console.log(recData);
+    //   this.setState({
+    //     data:recData.getData,
+    //     wait:false
+    //   })
+    //   console.log(this.state.data);
+    // });
+  }
+  handleInput(e){
+    let value = e.target.value;
+    this.setState({inputValue:value})
+  }
+  handleClick(){
+    let name = this.state.inputValue;
+    searchGit(name)
+    .then( (recData) => {
+      this.setState({
+        data:recData.getData,
+        wait:false
       })
-      .catch(function (error) {
-        alert(error);
-      });
+      // console.log(this.state.data);
+    });
   }
   render () {
+    let styles={
+      root:{
+        maxWidth:'200px',
+        margin:'0 auto',
+        border:'1px solid pink',
+        textAlign:'center'
+      }
+    }
+    let gitInfo = (
+      <div>
+        <h3>{this.state.data.name}</h3>
+        <img src={this.state.data.avatar_url} />
+      </div>
+    )
     return(
       <div>
-        {
-          this.state.wait ? '正在获取数据' :
-          <img src={this.state.data.avatar_url} />
-        }
+        <input type="text" value={this.state.inputValue} onChange={this.handleInput.bind(this)}/>
+        <button onClick={this.handleClick.bind(this)}>搜索</button><br />
+        {this.state.wait ? '请稍等' : gitInfo}
       </div>
     )
   }
